@@ -11,8 +11,8 @@ By default the start channel is set to `100`. This can easily be changed in the 
 
 | Channel | Purpose                                                                               |
 |---------|---------------------------------------------------------------------------------------|
-| 1       | Sets what worker to light up. 0 for IC 1 for Gardener Anything else for Office worker |
-| 2       | Sets where (fraction) the LED's should start to light up.                             |
+| 1       | Sets what worker to light up. 0 for IC, 1 for Gardener, anything else for Office worker |
+| 2       | Sets where (fraction) the LED's should start to light up.                          |
 | 3       | Sets where (fraction) the LED's should stop to light up.                              |
 | 4       | Sets the "R" component of the RGB color of the Clock.                                 |
 | 5       | Sets the "G" component of the RGB color of the Clock.                                 |
