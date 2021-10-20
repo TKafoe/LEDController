@@ -4,15 +4,15 @@
 #define DMX_START_CHANNEL 100
 #define DMX_SLAVE_CHANNELS 6
 
-#define NUM_LEDS_CLOCK 14
+#define NUM_LEDS_CLOCK 344
 #define NUM_LEDS_IC 14
 #define NUM_LEDS_GARDENER 14
 #define NUM_LEDS_OFFICE 14
 
 #define DATA_PIN_CLOCK 9
-#define DATA_PIN_IC 9
-#define DATA_PIN_GARDENER 9
-#define DATA_PIN_OFFICE 9
+#define DATA_PIN_IC 10
+#define DATA_PIN_GARDENER 11
+#define DATA_PIN_OFFICE 12
 
 DMX_Slave dmx_slave(DMX_SLAVE_CHANNELS);
 CRGB clock_leds[NUM_LEDS_CLOCK];
@@ -45,21 +45,23 @@ void set_clock() {
   uint8_t g = dmx_slave.getChannelValue(5);
   uint8_t b = dmx_slave.getChannelValue(6);
 
-  uint8_t start = ((float)ch2 / 255) * NUM_LEDS_CLOCK;
-  uint8_t nd = ((float)ch3 / 255) * NUM_LEDS_CLOCK;
+  int start = ((float)ch2 / (float) 255) * NUM_LEDS_CLOCK;
+  int nd = ((float)ch3 / (float) 255) * NUM_LEDS_CLOCK;
 
-  for (uint8_t i = 0; i < NUM_LEDS_CLOCK; i++) {
-    if (nd < start) {
-      if (i >= start || i <= nd) {
-        clock_leds[i] = CRGB(r, g, b);
-      } else {
-        clock_leds[i] = CRGB::Black;
-      }
-    } else {
+  if (nd > start) {
+    for (int i = 0; i < NUM_LEDS_CLOCK; i++) {
       if (i >= start && i <= nd) {
         clock_leds[i] = CRGB(r, g, b);
       } else {
         clock_leds[i] = CRGB::Black;
+      }
+    }
+  } else {
+    for (int i = 0; i < NUM_LEDS_CLOCK; i++) {
+      if (i >= nd && i <= start) {
+        clock_leds[i] = CRGB::Black;
+      } else {
+        clock_leds[i] = CRGB(r, g, b);
       }
     }
   }
