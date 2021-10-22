@@ -5,30 +5,28 @@
 #define DMX_SLAVE_CHANNELS 6
 
 #define NUM_LEDS_CLOCK 344
-#define NUM_LEDS_IC 14
-#define NUM_LEDS_GARDENER 14
-#define NUM_LEDS_OFFICE 14
+#define NUM_LEDS_IC 60
+#define NUM_LEDS_GARDENER 60
+#define NUM_LEDS_OFFICE 60
+#define NUM_LEDS_CLOTHES NUM_LEDS_IC + NUM_LEDS_GARDENER + NUM_LEDS_OFFICE
 
+#define DATA_PIN_CLOTHES 10
 #define DATA_PIN_CLOCK 9
-#define DATA_PIN_IC 10
-#define DATA_PIN_GARDENER 11
-#define DATA_PIN_OFFICE 12
+
+#define SHIFT 20
+
+unsigned long long t = millis();
 
 DMX_Slave dmx_slave(DMX_SLAVE_CHANNELS);
 CRGB clock_leds[NUM_LEDS_CLOCK];
-CRGB ic_leds[NUM_LEDS_IC];
-CRGB office_leds[NUM_LEDS_OFFICE];
-CRGB gardener_leds[NUM_LEDS_GARDENER];
+CRGB clothes_leds[NUM_LEDS_CLOTHES];
 
 void setup() {
   dmx_slave.enable();
   dmx_slave.setStartAddress(DMX_START_CHANNEL);
 
   FastLED.addLeds<NEOPIXEL, DATA_PIN_CLOCK>(clock_leds, NUM_LEDS_CLOCK);
-  FastLED.addLeds<NEOPIXEL, DATA_PIN_IC>(ic_leds, NUM_LEDS_IC);
-  FastLED.addLeds<NEOPIXEL, DATA_PIN_GARDENER>(gardener_leds,
-                                               NUM_LEDS_GARDENER);
-  FastLED.addLeds<NEOPIXEL, DATA_PIN_OFFICE>(office_leds, NUM_LEDS_OFFICE);
+  FastLED.addLeds<NEOPIXEL, DATA_PIN_CLOTHES>(clothes_leds, NUM_LEDS_CLOTHES);
 }
 
 void loop() {
@@ -48,22 +46,24 @@ void set_clock() {
   int start = ((float)ch2 / (float) 255) * NUM_LEDS_CLOCK;
   int nd = ((float)ch3 / (float) 255) * NUM_LEDS_CLOCK;
 
-  if (nd > start) {
-    for (int i = 0; i < NUM_LEDS_CLOCK; i++) {
-      if (i >= start && i <= nd) {
+
+  for (int i = 0; i < NUM_LEDS_CLOCK; i++) {
+    int i_shifted = i + SHIFT;
+    i_shifted %= NUM_LEDS_CLOCK;
+
+    if (nd > start) {
+      if (i_shifted >= start && i_shifted <= nd) {
         clock_leds[i] = CRGB(r, g, b);
       } else {
         clock_leds[i] = CRGB::Black;
       }
-    }
-  } else {
-    for (int i = 0; i < NUM_LEDS_CLOCK; i++) {
-      if (i >= nd && i <= start) {
+    } else {
+      if (i_shifted >= nd && i_shifted <= start) {
         clock_leds[i] = CRGB::Black;
       } else {
         clock_leds[i] = CRGB(r, g, b);
       }
-    }
+    } 
   }
   return;
 }
@@ -73,18 +73,24 @@ void set_workers() {
 
   switch (ch1) {
   case 0: {
-    light_ic(true);
+    light_ic(false);
     light_gardener(false);
     light_office(false);
     break;
   }
   case 1: {
+    light_ic(true);
+    light_gardener(false);
+    light_office(false);
+    break;
+  }
+  case 2: {
     light_ic(false);
     light_gardener(true);
     light_office(false);
     break;
   }
-  case 2:
+  case 3:
   default: {
     light_ic(false);
     light_gardener(false);
@@ -94,11 +100,11 @@ void set_workers() {
 }
 
 void light_gardener(bool on) {
-  for (int i = 0; i < NUM_LEDS_GARDENER; i++) {
+  for (int i = NUM_LEDS_IC; i < NUM_LEDS_IC + NUM_LEDS_GARDENER; i++) {
     if (on) {
-      gardener_leds[i] = CRGB::Red;
+      clothes_leds[i] = CRGB::Red;
     } else {
-      gardener_leds[i] = CRGB::Black;
+      clothes_leds[i] = CRGB::Black;
     }
   }
 }
@@ -106,19 +112,19 @@ void light_gardener(bool on) {
 void light_ic(bool on) {
   for (int i = 0; i < NUM_LEDS_IC; i++) {
     if (on) {
-      ic_leds[i] = CRGB::Blue;
+      clothes_leds[i] = CRGB::Blue;
     } else {
-      ic_leds[i] = CRGB::Black;
+      clothes_leds[i] = CRGB::Black;
     }
   }
 }
 
 void light_office(bool on) {
-  for (int i = 0; i < NUM_LEDS_OFFICE; i++) {
+  for (int i = NUM_LEDS_IC + NUM_LEDS_GARDENER; i < NUM_LEDS_IC + NUM_LEDS_GARDENER + NUM_LEDS_OFFICE; i++) {
     if (on) {
-      office_leds[i] = CRGB::Green;
+      clothes_leds[i] = CRGB::Green;
     } else {
-      office_leds[i] = CRGB::Black;
+      clothes_leds[i] = CRGB::Black;
     }
   }
 }
