@@ -2,6 +2,8 @@
 The Arduino software that is used to control the LED strips included in the "The Cycle of Light" Glow project.
 
 The code is used on an Arduino Uno using the [CTC-DRA-10-1 DMX Shield](http://www.cqrobot.wiki/index.php/DMX_Shield_for_Arduino_SKU:_AngelDFR0260US) in Slave Mode.
+
+This code does not include the Midi-triggering Ableton file.
 ## Instructions
 
 Please set the data pins and number of LED's per connected strip accordingly before flashing the code.
